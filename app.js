@@ -32,6 +32,13 @@ const state = {
     object: null,
     literalStart: 0,
     literalEnd: 0
+  },
+  siteContent: {
+    sha: '',
+    source: '',
+    object: null,
+    literalStart: 0,
+    literalEnd: 0
   }
 };
 
@@ -41,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cacheElements();
   bindNavigation();
   bindForms();
+  bindSiteContentTools();
   bindPageTools();
   bindTranslationTools();
   hydrateControls();
@@ -76,6 +84,15 @@ function cacheElements() {
     'imageRefCount',
     'pagePreview',
     'previewStatus',
+    'loadSiteContentBtn',
+    'saveSiteContentBtn',
+    'sectionTypeSelect',
+    'addSectionBtn',
+    'siteContentCommitInput',
+    'siteSectionCount',
+    'siteSectionList',
+    'visualPreview',
+    'publicSiteLink',
     'loadTranslationsBtn',
     'saveTranslationsBtn',
     'translationSearchInput',
@@ -159,6 +176,22 @@ function bindForms() {
   els.imageFileInput.addEventListener('change', () => {
     const file = els.imageFileInput.files?.[0];
     if (file && !els.imageNameInput.value) els.imageNameInput.value = sanitizeFileName(file.name);
+  });
+}
+
+function bindSiteContentTools() {
+  els.loadSiteContentBtn.addEventListener('click', () => runTask('Loading homepage...', loadSiteContent));
+  els.saveSiteContentBtn.addEventListener('click', () => runTask('Saving homepage...', saveSiteContent));
+  els.addSectionBtn.addEventListener('click', () => {
+    if (!state.siteContent.object) {
+      showToast('Load the homepage first');
+      return;
+    }
+    const sections = getHomepageSections();
+    sections.push(sectionTemplate(els.sectionTypeSelect.value));
+    renderSiteSections();
+    renderVisualPreview();
+    showToast('Section added');
   });
 }
 
@@ -526,6 +559,333 @@ function refreshImageSelects() {
   if (state.currentPage.document) renderImageBlocks();
 }
 
+async function loadSiteContent() {
+  const file = await getContent('site-content.js');
+  const source = decodeBase64(file.content);
+  const extracted = extractObjectLiteral(source, 'window.ATELIER_CONTENT =');
+  const content = Function(`"use strict"; return (${extracted.literal});`)();
+
+  state.siteContent = {
+    sha: file.sha,
+    source,
+    object: content,
+    literalStart: extracted.start,
+    literalEnd: extracted.end
+  };
+
+  getHomepageSections();
+  renderSiteSections();
+  renderVisualPreview();
+  showToast('Loaded homepage sections');
+}
+
+function getHomepageSections() {
+  const content = state.siteContent.object || {};
+  content.home = content.home && typeof content.home === 'object' ? content.home : {};
+  content.home.sections = Array.isArray(content.home.sections) ? content.home.sections : [];
+  state.siteContent.object = content;
+  return content.home.sections;
+}
+
+function renderSiteSections() {
+  els.siteSectionList.innerHTML = '';
+  if (!state.siteContent.object) {
+    els.siteSectionCount.textContent = '0';
+    els.siteSectionList.innerHTML = '<div class="tool-card">Load the homepage to see its current sections.</div>';
+    renderVisualPreview();
+    return;
+  }
+
+  const sections = getHomepageSections();
+  els.siteSectionCount.textContent = String(sections.length);
+
+  if (!sections.length) {
+    els.siteSectionList.innerHTML = '<div class="tool-card">No sections yet. Add one above.</div>';
+    renderVisualPreview();
+    return;
+  }
+
+  sections.forEach((section, index) => {
+    const card = document.createElement('article');
+    card.className = 'site-section-card';
+    const title = section.title || section.heading || section.label || `Section ${index + 1}`;
+    const description = section.body || section.text || section.description || section.subtitle || summarizeSectionItems(section);
+    card.innerHTML = `
+      <div class="site-section-summary">
+        <div>
+          <span class="site-section-type">${escapeHtml(section.type || 'section')}</span>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(description)}</p>
+        </div>
+        <div class="section-actions">
+          <button class="ghost-btn" type="button" data-section-action="up" ${index === 0 ? 'disabled' : ''}>Up</button>
+          <button class="ghost-btn" type="button" data-section-action="down" ${index === sections.length - 1 ? 'disabled' : ''}>Down</button>
+          <button class="ghost-btn" type="button" data-section-action="duplicate">Duplicate</button>
+          <button class="ghost-btn" type="button" data-section-action="delete">Delete</button>
+        </div>
+      </div>
+      <textarea class="site-section-json" data-section-json="${index}" rows="14" spellcheck="false"></textarea>
+      <div class="action-row">
+        <button class="secondary-btn" type="button" data-section-action="apply">Apply edit</button>
+      </div>
+    `;
+
+    const textarea = card.querySelector('[data-section-json]');
+    textarea.value = JSON.stringify(section, null, 2);
+    textarea.addEventListener('input', () => textarea.classList.remove('is-invalid'));
+
+    card.querySelectorAll('[data-section-action]').forEach(button => {
+      button.addEventListener('click', () => {
+        const action = button.dataset.sectionAction;
+        if (action === 'apply') applySectionJson(index, textarea.value);
+        if (action === 'duplicate') duplicateSection(index);
+        if (action === 'up') moveSection(index, -1);
+        if (action === 'down') moveSection(index, 1);
+        if (action === 'delete') deleteSection(index);
+      });
+    });
+
+    els.siteSectionList.appendChild(card);
+  });
+}
+
+function summarizeSectionItems(section) {
+  const collections = [section.items, section.steps, section.actions].filter(Array.isArray);
+  if (!collections.length) return '';
+  return collections
+    .flat()
+    .slice(0, 3)
+    .map(item => item.title || item.label || item.heading || item.name)
+    .filter(Boolean)
+    .join(' / ');
+}
+
+function applySectionJson(index, value) {
+  try {
+    const parsed = JSON.parse(value);
+    if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('Section must be an object');
+    const sections = getHomepageSections();
+    sections[index] = parsed;
+    renderSiteSections();
+    renderVisualPreview();
+    showToast('Section updated');
+  } catch (error) {
+    els.siteSectionList.querySelector(`[data-section-json="${index}"]`)?.classList.add('is-invalid');
+    showToast(error.message || 'Fix this section JSON');
+  }
+}
+
+function duplicateSection(index) {
+  if (!syncSiteSectionEditors()) return;
+  const sections = getHomepageSections();
+  const copy = JSON.parse(JSON.stringify(sections[index]));
+  copy.id = uniqueSectionId(`${copy.id || copy.type || 'section'}-copy`);
+  sections.splice(index + 1, 0, copy);
+  renderSiteSections();
+  renderVisualPreview();
+  showToast('Section duplicated');
+}
+
+function moveSection(index, direction) {
+  if (!syncSiteSectionEditors()) return;
+  const sections = getHomepageSections();
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= sections.length) return;
+  [sections[index], sections[nextIndex]] = [sections[nextIndex], sections[index]];
+  renderSiteSections();
+  renderVisualPreview();
+}
+
+function deleteSection(index) {
+  if (!window.confirm('Delete this homepage section?')) return;
+  if (!syncSiteSectionEditors()) return;
+  getHomepageSections().splice(index, 1);
+  renderSiteSections();
+  renderVisualPreview();
+  showToast('Section deleted');
+}
+
+function syncSiteSectionEditors() {
+  if (!state.siteContent.object) return false;
+  const editors = Array.from(els.siteSectionList.querySelectorAll('[data-section-json]'));
+  if (!editors.length) return true;
+  const sections = [];
+
+  for (const editor of editors) {
+    try {
+      const parsed = JSON.parse(editor.value);
+      if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('Section must be an object');
+      sections.push(parsed);
+      editor.classList.remove('is-invalid');
+    } catch {
+      editor.classList.add('is-invalid');
+      showToast(`Fix JSON in section ${Number(editor.dataset.sectionJson) + 1}`);
+      return false;
+    }
+  }
+
+  state.siteContent.object.home.sections = sections;
+  return true;
+}
+
+function renderVisualPreview() {
+  if (!els.visualPreview) return;
+  els.publicSiteLink.href = `https://${state.config.repo === 'atelier-koka-site' ? 'atelier-koka-site' : state.config.repo}.onrender.com/`;
+  els.visualPreview.innerHTML = '';
+
+  if (!state.siteContent.object) {
+    els.visualPreview.innerHTML = '<div class="visual-preview-copy">Load the homepage to preview the current public sections.</div>';
+    return;
+  }
+
+  const sections = getHomepageSections();
+  if (!sections.length) {
+    els.visualPreview.innerHTML = '<div class="visual-preview-copy">No homepage sections yet.</div>';
+    return;
+  }
+
+  sections.forEach(section => {
+    const image = getSectionImage(section);
+    const title = section.title || section.heading || section.label || section.type || 'Section';
+    const text = section.body || section.text || section.description || section.subtitle || summarizeSectionItems(section);
+    const card = document.createElement('article');
+    card.className = 'visual-preview-card';
+    card.innerHTML = `
+      ${image ? `<img alt="" src="${escapeAttribute(previewSiteAsset(image))}">` : '<div class="visual-preview-image-empty"></div>'}
+      <div class="visual-preview-copy">
+        <span>${escapeHtml(section.type || 'section')}</span>
+        <h4>${escapeHtml(title)}</h4>
+        <p>${escapeHtml(text)}</p>
+      </div>
+    `;
+    els.visualPreview.appendChild(card);
+  });
+}
+
+function getSectionImage(section) {
+  if (section.primaryImage) return section.primaryImage;
+  if (section.image) return section.image;
+  if (Array.isArray(section.items)) {
+    const item = section.items.find(entry => entry.image || entry.primaryImage);
+    if (item) return item.image || item.primaryImage;
+  }
+  return '';
+}
+
+function previewSiteAsset(path) {
+  if (!path || /^https?:|^data:/i.test(path)) return path;
+  return rawUrl(path.replace(/^\/+/, ''));
+}
+
+function uniqueSectionId(base) {
+  const normalized = String(base || 'section')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'section';
+  const existing = new Set(getHomepageSections().map(section => section.id).filter(Boolean));
+  if (!existing.has(normalized)) return normalized;
+  let suffix = 2;
+  while (existing.has(`${normalized}-${suffix}`)) suffix += 1;
+  return `${normalized}-${suffix}`;
+}
+
+function sectionTemplate(type) {
+  const id = uniqueSectionId(`${type}-${Date.now().toString(36).slice(-5)}`);
+  const templates = {
+    hero: {
+      id,
+      type: 'hero',
+      kicker: 'New homepage story',
+      title: 'Atelier Koka',
+      body: 'Rewrite this hero with a sharper message for the studio.',
+      primaryAction: { label: 'Book a tattoo', href: 'contact/' },
+      secondaryAction: { label: 'View work', href: 'artists/' },
+      primaryImage: 'assets/koka-studio-table.jpg',
+      primaryAlt: 'Atelier Koka studio table',
+      secondaryImage: 'assets/koka-process-collage.jpg',
+      secondaryAlt: 'Atelier Koka process collage'
+    },
+    manifesto: {
+      id,
+      type: 'manifesto',
+      kicker: 'Point of view',
+      title: 'A new section title',
+      items: [
+        { title: 'One', text: 'Describe the first idea.' },
+        { title: 'Two', text: 'Describe the second idea.' },
+        { title: 'Three', text: 'Describe the third idea.' }
+      ]
+    },
+    gallery: {
+      id,
+      type: 'gallery',
+      kicker: 'Image wall',
+      title: 'New gallery section',
+      body: 'Add studio, tattoo, drawing or flash images here.',
+      items: [
+        { title: 'Image one', text: 'Short caption.', image: 'assets/koka-studio-table.jpg', alt: 'Atelier Koka image' },
+        { title: 'Image two', text: 'Short caption.', image: 'assets/koka-flash-wall.jpg', alt: 'Atelier Koka image' }
+      ]
+    },
+    editorial: {
+      id,
+      type: 'editorial',
+      kicker: 'Editorial block',
+      title: 'New editorial split',
+      body: 'Use this for a strong text and image moment.',
+      image: 'assets/koka-paper-archive.jpg',
+      alt: 'Atelier Koka paper archive',
+      notes: ['Rewrite note one', 'Rewrite note two']
+    },
+    process: {
+      id,
+      type: 'process',
+      kicker: 'Process',
+      title: 'A new process band',
+      steps: [
+        { title: 'Consult', text: 'Describe this step.' },
+        { title: 'Draw', text: 'Describe this step.' },
+        { title: 'Tattoo', text: 'Describe this step.' }
+      ]
+    },
+    booking: {
+      id,
+      type: 'booking',
+      kicker: 'Booking',
+      title: 'Ready to start?',
+      body: 'Invite visitors to book, ask a question or share a tattoo idea.',
+      buttonLabel: 'Start a request',
+      buttonHref: 'contact/'
+    }
+  };
+  return templates[type] || templates.editorial;
+}
+
+function saveSiteContent() {
+  if (!state.siteContent.object) {
+    showToast('Load the homepage before saving');
+    return Promise.resolve();
+  }
+  if (!syncSiteSectionEditors()) return Promise.resolve();
+
+  const nextSource = `${state.siteContent.source.slice(0, state.siteContent.literalStart)}${JSON.stringify(state.siteContent.object, null, 2)}${state.siteContent.source.slice(state.siteContent.literalEnd)}`;
+  return putContent(
+    'site-content.js',
+    encodeBase64(nextSource),
+    els.siteContentCommitInput.value.trim() || 'Update homepage sections',
+    state.siteContent.sha
+  ).then(result => {
+    state.siteContent.sha = result.content.sha;
+    state.siteContent.source = nextSource;
+    const extracted = extractObjectLiteral(nextSource, 'window.ATELIER_CONTENT =');
+    state.siteContent.literalStart = extracted.start;
+    state.siteContent.literalEnd = extracted.end;
+    renderSiteSections();
+    renderVisualPreview();
+    showToast('Saved homepage sections');
+  });
+}
+
 function savePage() {
   if (!state.currentPage.document || !state.currentPage.path) {
     showToast('Load a page before saving');
@@ -776,6 +1136,13 @@ function escapeAttribute(value) {
   return String(value)
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
