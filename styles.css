@@ -19,6 +19,7 @@ html {
 }
 
 body {
+  overflow-x: hidden;
   min-height: 100%;
   margin: 0;
   background:
@@ -35,6 +36,7 @@ input,
 textarea,
 select {
   font: inherit;
+  min-width: 0;
 }
 
 button {
@@ -43,6 +45,7 @@ button {
 
 .top-shell {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
@@ -54,7 +57,7 @@ button {
   color: var(--red);
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: .16em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -67,14 +70,14 @@ h3 {
 
 h1 {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(36px, 6vw, 72px);
+  font-size: 72px;
   letter-spacing: 0;
   text-transform: uppercase;
 }
 
 h2 {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(30px, 4vw, 52px);
+  font-size: 52px;
   letter-spacing: 0;
 }
 
@@ -84,6 +87,7 @@ h3 {
 }
 
 .status-pill {
+  max-width: 100%;
   border: 1px solid var(--ink);
   border-radius: 999px;
   padding: 9px 13px;
@@ -91,6 +95,7 @@ h3 {
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
+  overflow-wrap: anywhere;
   text-transform: uppercase;
 }
 
@@ -102,7 +107,7 @@ h3 {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
   gap: 18px;
   padding: 0 clamp(18px, 4vw, 54px) 48px;
 }
@@ -111,6 +116,7 @@ h3 {
   position: sticky;
   top: 16px;
   align-self: start;
+  align-content: start;
   display: grid;
   gap: 8px;
   padding: 12px;
@@ -124,14 +130,17 @@ h3 {
 .primary-btn,
 .secondary-btn,
 .ghost-btn {
+  min-width: 0;
   min-height: 42px;
   border: 1px solid var(--ink);
   border-radius: 999px;
   padding: 10px 14px;
   font-size: 12px;
   font-weight: 900;
-  letter-spacing: .08em;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
   text-transform: uppercase;
+  white-space: normal;
 }
 
 .nav-item {
@@ -165,7 +174,10 @@ h3 {
   opacity: .58;
 }
 
-.workspace {
+.workspace,
+.panel,
+.tool-card,
+.preview-card {
   min-width: 0;
 }
 
@@ -181,9 +193,16 @@ h3 {
 .mini-head,
 .action-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.action-row .primary-btn,
+.action-row .secondary-btn,
+.action-row .ghost-btn {
+  flex: 1 1 150px;
 }
 
 .section-head {
@@ -219,7 +238,7 @@ label {
   color: var(--muted);
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: .1em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -276,7 +295,7 @@ select:focus {
 
 .home-steps {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -307,7 +326,7 @@ select:focus {
   margin-top: 10px;
   text-transform: uppercase;
   font-size: 12px;
-  letter-spacing: .08em;
+  letter-spacing: 0;
 }
 
 .home-steps p,
@@ -335,7 +354,7 @@ select:focus {
 
 .asset-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
   gap: 14px;
   margin-top: 18px;
 }
@@ -408,7 +427,7 @@ select:focus {
   color: var(--muted);
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: .08em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -435,6 +454,7 @@ select:focus {
 #pagePreview {
   width: 100%;
   height: min(72vh, 760px);
+  min-height: 420px;
   margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -443,7 +463,7 @@ select:focus {
 
 .translation-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 12px;
   padding: 12px;
   border: 1px solid var(--line);
@@ -460,7 +480,7 @@ select:focus {
 }
 
 .shop-editor-grid {
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
 }
 
 .site-section-list {
@@ -499,6 +519,10 @@ select:focus {
   cursor: pointer;
 }
 
+.shop-section-card summary > div {
+  min-width: 0;
+}
+
 .shop-section-card summary::-webkit-details-marker {
   display: none;
 }
@@ -512,7 +536,7 @@ select:focus {
 
 .shop-field-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 12px;
   border-top: 1px solid var(--line);
   padding: 16px;
@@ -550,6 +574,7 @@ select:focus {
   display: grid;
   gap: 16px;
   align-self: start;
+  min-width: 0;
 }
 
 .site-section-card {
@@ -567,6 +592,10 @@ select:focus {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
+}
+
+.site-section-summary > div {
+  min-width: 0;
 }
 
 .site-section-summary img {
@@ -588,7 +617,7 @@ select:focus {
   padding: 5px 9px;
   font-size: 10px;
   font-weight: 900;
-  letter-spacing: .1em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -596,6 +625,12 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.section-actions .ghost-btn,
+.section-actions .secondary-btn,
+.section-actions .primary-btn {
+  flex: 1 1 92px;
 }
 
 .site-section-json {
@@ -624,6 +659,7 @@ select:focus {
 #homePreviewFrame {
   width: 100%;
   height: min(68vh, 720px);
+  min-height: 420px;
   margin-top: 14px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -638,7 +674,7 @@ select:focus {
 
 .confirmation-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: 8px;
   margin-top: 12px;
 }
@@ -712,10 +748,21 @@ select:focus {
 }
 
 @media (max-width: 980px) {
+  .top-shell {
+    padding: 24px 28px 18px;
+  }
+
+  h1 {
+    font-size: 56px;
+  }
+
+  h2 {
+    font-size: 42px;
+  }
+
   .app-shell,
   .editor-grid,
   .visual-editor-grid,
-  .home-steps,
   .grid.two {
     grid-template-columns: 1fr;
   }
@@ -725,8 +772,37 @@ select:focus {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .sticky-preview {
+    position: static;
+  }
+
   .nav-item {
     text-align: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-shell {
+    padding: 22px 18px 16px;
+  }
+
+  .app-shell {
+    gap: 14px;
+    padding: 0 18px 40px;
+  }
+
+  .tool-card,
+  .preview-card {
+    padding: 16px;
+  }
+
+  .home-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #homePreviewFrame,
+  #pagePreview {
+    height: 520px;
   }
 }
 
@@ -739,6 +815,25 @@ select:focus {
     flex-direction: column;
   }
 
+  h1 {
+    font-size: 42px;
+  }
+
+  h2 {
+    font-size: 34px;
+  }
+
+  .status-pill {
+    width: 100%;
+    text-align: center;
+  }
+
+  .action-row .primary-btn,
+  .action-row .secondary-btn,
+  .action-row .ghost-btn {
+    flex: 0 0 auto;
+  }
+
   .sidebar {
     grid-template-columns: 1fr 1fr;
   }
@@ -746,10 +841,17 @@ select:focus {
   .translation-row,
   .image-row,
   .site-section-summary,
-  .shop-field-grid,
-  .shop-section-card summary,
-  .confirmation-actions {
+  .shop-section-card summary {
     grid-template-columns: 1fr;
+  }
+
+  .home-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-section-card summary,
+  .shop-field-grid {
+    padding: 14px;
   }
 
   .image-row img {
@@ -760,5 +862,79 @@ select:focus {
   .site-section-summary img {
     width: 100%;
     height: 180px;
+  }
+
+  .section-actions .ghost-btn,
+  .section-actions .secondary-btn,
+  .section-actions .primary-btn,
+  .confirmation-actions .ghost-btn,
+  .confirmation-actions .secondary-btn,
+  .confirmation-actions .primary-btn {
+    width: 100%;
+  }
+
+  #homePreviewFrame,
+  #pagePreview {
+    height: 440px;
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 430px) {
+  .top-shell {
+    gap: 12px;
+    padding: 18px 12px 14px;
+  }
+
+  .app-shell {
+    gap: 12px;
+    padding: 0 12px 32px;
+  }
+
+  h1 {
+    font-size: 34px;
+  }
+
+  h2 {
+    font-size: 30px;
+  }
+
+  .sidebar {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .nav-item,
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .tool-card,
+  .preview-card,
+  .home-steps div,
+  .asset-card,
+  .site-section-card {
+    padding: 12px;
+  }
+
+  .shop-section-card summary,
+  .shop-field-grid {
+    padding: 12px;
+  }
+
+  #homePreviewFrame,
+  #pagePreview {
+    height: 380px;
+    min-height: 320px;
+  }
+
+  .toast {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    max-width: none;
   }
 }
