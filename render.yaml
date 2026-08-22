@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: atelier-koka-admin
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
+    autoDeployTrigger: commit

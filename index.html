@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Atelier Koka Control Room</title>
+  <meta name="description" content="Private editor for Atelier Koka pages and image assets.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top-shell">
+    <div>
+      <p class="eyebrow">Atelier Koka</p>
+      <h1>Control Room</h1>
+    </div>
+    <div class="status-pill" id="connectionStatus">Not connected</div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar" aria-label="Admin sections">
+      <button class="nav-item is-active" data-panel-target="connectPanel" type="button">Connect</button>
+      <button class="nav-item" data-panel-target="imagesPanel" type="button">Images</button>
+      <button class="nav-item" data-panel-target="pagesPanel" type="button">Pages</button>
+      <button class="nav-item" data-panel-target="translationsPanel" type="button">FR Text</button>
+      <button class="nav-item" data-panel-target="helpPanel" type="button">Help</button>
+    </aside>
+
+    <section class="workspace">
+      <section class="panel is-active" id="connectPanel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Secure session</p>
+            <h2>Connect to the website repo</h2>
+          </div>
+          <button class="ghost-btn" id="clearSessionBtn" type="button">Clear session</button>
+        </div>
+
+        <div class="grid two">
+          <form class="tool-card form-stack" id="connectForm">
+            <label>
+              GitHub owner
+              <input id="ownerInput" autocomplete="off" value="RAYMAN720">
+            </label>
+            <label>
+              Repository
+              <input id="repoInput" autocomplete="off" value="atelier-koka-site">
+            </label>
+            <label>
+              Branch
+              <input id="branchInput" autocomplete="off" value="main">
+            </label>
+            <label>
+              GitHub token
+              <input id="tokenInput" type="password" autocomplete="off" placeholder="Fine-grained token with Contents read/write">
+            </label>
+            <label class="check-row">
+              <input id="rememberTokenInput" type="checkbox">
+              Keep token on this device
+            </label>
+            <button class="primary-btn" type="submit">Connect</button>
+          </form>
+
+          <div class="tool-card">
+            <h3>How this works</h3>
+            <p>This admin page is separate from the public site. It reads and writes files in GitHub, then Render can deploy the new commit.</p>
+            <p>The token is never committed to the project. By default it is kept only for this browser session.</p>
+            <ul class="plain-list">
+              <li>Use a fine-grained GitHub token.</li>
+              <li>Give access only to <strong>RAYMAN720/atelier-koka-site</strong>.</li>
+              <li>Repository permissions: <strong>Contents: Read and write</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="imagesPanel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Gestion des images</p>
+            <h2>Upload and replace image assets</h2>
+          </div>
+          <button class="ghost-btn" id="refreshImagesBtn" type="button">Refresh</button>
+        </div>
+
+        <div class="grid two">
+          <form class="tool-card form-stack" id="uploadForm">
+            <label>
+              Image file
+              <input id="imageFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml">
+            </label>
+            <label>
+              File name
+              <input id="imageNameInput" autocomplete="off" placeholder="auto-generated-from-file">
+            </label>
+            <label>
+              Commit message
+              <input id="imageCommitInput" autocomplete="off" value="Add website image">
+            </label>
+            <button class="primary-btn" type="submit">Upload image</button>
+          </form>
+
+          <div class="tool-card">
+            <h3>Image tips</h3>
+            <p>Use JPG or WebP for tattoo photos. Keep each image under 1-2 MB when possible so the public site stays fast.</p>
+            <p>After upload, use the Pages editor to choose that image for a page image slot.</p>
+          </div>
+        </div>
+
+        <div class="asset-grid" id="assetGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" id="pagesPanel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Edition des pages</p>
+            <h2>Edit page text and image references</h2>
+          </div>
+          <div class="action-row">
+            <button class="ghost-btn" id="loadPageBtn" type="button">Load page</button>
+            <button class="primary-btn" id="savePageBtn" type="button">Save page</button>
+          </div>
+        </div>
+
+        <div class="editor-grid">
+          <div class="tool-card form-stack">
+            <label>
+              Page
+              <select id="pageSelect"></select>
+            </label>
+            <label>
+              Custom path
+              <input id="customPagePathInput" autocomplete="off" placeholder="optional, for example blog/index.html">
+            </label>
+            <label>
+              Page title
+              <input id="pageTitleInput" autocomplete="off">
+            </label>
+            <label>
+              Meta description
+              <textarea id="pageDescriptionInput" rows="4"></textarea>
+            </label>
+            <label>
+              Commit message
+              <input id="pageCommitInput" autocomplete="off" value="Update website page">
+            </label>
+            <div class="notice">Changing English text can require updating the FR Text dictionary so the public language switcher keeps translating it.</div>
+          </div>
+
+          <div class="editor-stack">
+            <div class="tool-card">
+              <div class="mini-head">
+                <h3>Text blocks</h3>
+                <span id="textCount">0</span>
+              </div>
+              <div class="block-list" id="textBlocks"></div>
+            </div>
+            <div class="tool-card">
+              <div class="mini-head">
+                <h3>Images on this page</h3>
+                <span id="imageRefCount">0</span>
+              </div>
+              <div class="block-list" id="imageBlocks"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-card">
+          <div class="mini-head">
+            <h3>Preview</h3>
+            <span id="previewStatus">No page loaded</span>
+          </div>
+          <iframe id="pagePreview" title="Page preview" sandbox=""></iframe>
+        </div>
+      </section>
+
+      <section class="panel" id="translationsPanel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">French dictionary</p>
+            <h2>Edit language switcher text</h2>
+          </div>
+          <div class="action-row">
+            <button class="ghost-btn" id="loadTranslationsBtn" type="button">Load FR text</button>
+            <button class="primary-btn" id="saveTranslationsBtn" type="button">Save FR text</button>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="tool-card form-stack">
+            <label>
+              Search text
+              <input id="translationSearchInput" autocomplete="off" placeholder="Filter by English or French">
+            </label>
+            <label>
+              Commit message
+              <input id="translationCommitInput" autocomplete="off" value="Update French website text">
+            </label>
+          </div>
+          <form class="tool-card form-stack" id="addTranslationForm">
+            <label>
+              English source text
+              <textarea id="newTranslationKeyInput" rows="3"></textarea>
+            </label>
+            <label>
+              French text
+              <textarea id="newTranslationValueInput" rows="3"></textarea>
+            </label>
+            <button class="secondary-btn" type="submit">Add translation</button>
+          </form>
+        </div>
+
+        <div class="translation-list" id="translationList"></div>
+      </section>
+
+      <section class="panel" id="helpPanel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Workflow</p>
+            <h2>Recommended editing flow</h2>
+          </div>
+        </div>
+        <div class="tool-card help-copy">
+          <ol>
+            <li>Connect with a GitHub token for the public website repo.</li>
+            <li>Upload new tattoo, flash, drawing, or studio images in Images.</li>
+            <li>Open Pages, choose a page, replace image slots, and edit text.</li>
+            <li>When English source text changes, update matching entries in FR Text.</li>
+            <li>Save changes. Each save creates a GitHub commit for Render to deploy.</li>
+          </ol>
+          <p>For bigger redesigns, keep using Codex. This control room is meant for everyday content changes.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
