@@ -209,6 +209,7 @@ const state = {
 };
 
 const els = {};
+let busyDepth = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
   cacheElements();
@@ -219,6 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
   bindTranslationTools();
   hydrateControls();
   updateConnectionStatus();
+  setLoadingUi(false);
+  document.body.classList.remove('is-booting');
 });
 
 function cacheElements() {
@@ -269,6 +272,9 @@ function cacheElements() {
     'sendWhatsappConfirmBtn',
     'sendSmsConfirmBtn',
     'copyConfirmMessageBtn',
+    'pageLoader',
+    'loaderTitle',
+    'loaderSubline',
     'loadTranslationsBtn',
     'saveTranslationsBtn',
     'translationSearchInput',
@@ -286,10 +292,15 @@ function cacheElements() {
 function bindNavigation() {
   document.querySelectorAll('[data-panel-target]').forEach(button => {
     button.addEventListener('click', () => {
+      const targetPanel = document.getElementById(button.dataset.panelTarget);
+      if (!targetPanel || targetPanel.classList.contains('is-active')) return;
+
       document.querySelectorAll('[data-panel-target]').forEach(item => item.classList.remove('is-active'));
       document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('is-active'));
       button.classList.add('is-active');
-      document.getElementById(button.dataset.panelTarget)?.classList.add('is-active');
+      targetPanel.classList.add('is-active');
+      targetPanel.classList.remove('is-entering');
+      requestAnimationFrame(() => targetPanel.classList.add('is-entering'));
     });
   });
 }
@@ -1559,7 +1570,7 @@ function escapeHtml(value) {
 }
 
 async function runTask(label, task) {
-  setBusy(true);
+  startTask(label);
   try {
     showToast(label);
     await task();
@@ -1567,8 +1578,23 @@ async function runTask(label, task) {
     console.error(error);
     showToast(error.message || 'Something went wrong');
   } finally {
-    setBusy(false);
+    finishTask();
   }
+}
+
+function startTask(label) {
+  busyDepth += 1;
+  setBusy(true);
+  setLoadingUi(true, label);
+  document.querySelector('.panel.is-active')?.classList.add('is-loading');
+}
+
+function finishTask() {
+  busyDepth = Math.max(0, busyDepth - 1);
+  if (busyDepth > 0) return;
+  setBusy(false);
+  setLoadingUi(false);
+  document.querySelectorAll('.panel.is-loading').forEach(panel => panel.classList.remove('is-loading'));
 }
 
 function setBusy(isBusy) {
@@ -1576,6 +1602,34 @@ function setBusy(isBusy) {
     if (button.classList.contains('nav-item')) return;
     button.disabled = isBusy;
   });
+}
+
+function setLoadingUi(isLoading, label = 'Loading...') {
+  document.body.classList.toggle('is-busy', isLoading);
+  document.body.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+
+  if (!els.pageLoader) return;
+  const cleanLabel = label.replace(/\.{3}$/, '');
+  if (els.loaderTitle) els.loaderTitle.textContent = isLoading ? cleanLabel : 'Loading...';
+  if (els.loaderSubline) {
+    els.loaderSubline.textContent = isLoading
+      ? loadingSubline(cleanLabel)
+      : 'Preparing the editor.';
+  }
+
+  els.pageLoader.hidden = !isLoading;
+  els.pageLoader.setAttribute('aria-hidden', isLoading ? 'false' : 'true');
+}
+
+function loadingSubline(label) {
+  const lower = label.toLowerCase();
+  if (lower.includes('homepage')) return 'Opening the homepage editor and preview.';
+  if (lower.includes('page')) return 'Reading the page text, images, and preview.';
+  if (lower.includes('image') || lower.includes('upload')) return 'Updating the website image library.';
+  if (lower.includes('french') || lower.includes('fr text')) return 'Loading the language dictionary.';
+  if (lower.includes('saving')) return 'Creating the website update in GitHub.';
+  if (lower.includes('connect')) return 'Checking the private GitHub connection.';
+  return 'Please wait while the editor finishes this action.';
 }
 
 let toastTimer;

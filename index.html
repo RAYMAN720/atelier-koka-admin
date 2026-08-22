@@ -6,9 +6,9 @@
   <title>Atelier Koka Control Room</title>
   <meta name="description" content="Private editor for Atelier Koka pages and image assets.">
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css?v=20260822-responsive">
+  <link rel="stylesheet" href="styles.css?v=20260822-motion">
 </head>
-<body>
+<body class="is-booting">
   <header class="top-shell">
     <div>
       <p class="eyebrow">Atelier Koka</p>
@@ -314,7 +314,16 @@
     </section>
   </main>
 
+  <div class="page-loader" id="pageLoader" role="status" aria-live="polite" aria-hidden="false">
+    <div class="loader-card">
+      <div class="loader-mark" aria-hidden="true"><span></span></div>
+      <div>
+        <strong id="loaderTitle">Loading...</strong>
+        <p id="loaderSubline">Preparing the editor.</p>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20260822"></script>
+  <script src="app.js?v=20260822-motion"></script>
 </body>
 </html>

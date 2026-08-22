@@ -8,6 +8,8 @@
   --teal: #0e6d68;
   --gold: #b5832f;
   --shadow: 0 18px 48px rgba(25, 21, 18, .12);
+  --active-shadow: 0 12px 30px rgba(173, 16, 24, .18);
+  --ease: cubic-bezier(.2, .8, .2, 1);
 }
 
 * {
@@ -16,6 +18,7 @@
 
 html {
   min-height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -31,6 +34,10 @@ body {
   line-height: 1.5;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 input,
 textarea,
@@ -41,6 +48,23 @@ select {
 
 button {
   cursor: pointer;
+  transition:
+    background-color .18s var(--ease),
+    border-color .18s var(--ease),
+    box-shadow .18s var(--ease),
+    color .18s var(--ease),
+    opacity .18s var(--ease),
+    transform .18s var(--ease);
+}
+
+button:not(:disabled):hover {
+  box-shadow: 0 8px 18px rgba(25, 21, 18, .14);
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  box-shadow: 0 4px 10px rgba(25, 21, 18, .12);
+  transform: translateY(0) scale(.98);
 }
 
 .top-shell {
@@ -97,12 +121,18 @@ h3 {
   font-weight: 800;
   overflow-wrap: anywhere;
   text-transform: uppercase;
+  transition:
+    background-color .22s var(--ease),
+    border-color .22s var(--ease),
+    color .22s var(--ease),
+    transform .22s var(--ease);
 }
 
 .status-pill.is-online {
   background: var(--teal);
   color: white;
   border-color: var(--teal);
+  transform: translateY(-1px);
 }
 
 .app-shell {
@@ -156,6 +186,10 @@ h3 {
   border-color: var(--red);
 }
 
+.nav-item.is-active {
+  box-shadow: var(--active-shadow);
+}
+
 .secondary-btn {
   background: var(--teal);
   color: white;
@@ -187,6 +221,12 @@ h3 {
 
 .panel.is-active {
   display: block;
+  animation: panelIn .28s var(--ease) both;
+}
+
+.panel.is-loading {
+  opacity: .72;
+  transition: opacity .2s var(--ease);
 }
 
 .section-head,
@@ -225,6 +265,20 @@ h3 {
   background: rgba(255, 249, 239, .88);
   box-shadow: var(--shadow);
   padding: 18px;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
+}
+
+.tool-card:hover,
+.preview-card:hover,
+.asset-card:hover,
+.site-section-card:hover,
+.shop-section-card:hover,
+.visual-preview-card:hover {
+  border-color: rgba(25, 21, 18, .28);
+  box-shadow: 0 20px 54px rgba(25, 21, 18, .16);
 }
 
 .form-stack {
@@ -254,6 +308,10 @@ select {
   outline: 0;
   letter-spacing: 0;
   text-transform: none;
+  transition:
+    border-color .18s var(--ease),
+    box-shadow .18s var(--ease),
+    transform .18s var(--ease);
 }
 
 textarea {
@@ -266,6 +324,7 @@ textarea:focus,
 select:focus {
   border-color: var(--red);
   box-shadow: 0 0 0 3px rgba(173, 16, 24, .14);
+  transform: translateY(-1px);
 }
 
 .check-row {
@@ -306,6 +365,17 @@ select:focus {
   border-radius: 8px;
   background: rgba(255, 249, 239, .78);
   padding: 14px;
+  animation: cardIn .26s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
+}
+
+.home-steps div:hover {
+  border-color: rgba(173, 16, 24, .32);
+  box-shadow: 0 12px 28px rgba(25, 21, 18, .10);
+  transform: translateY(-2px);
 }
 
 .home-steps span,
@@ -366,6 +436,11 @@ select:focus {
   border-radius: 8px;
   background: var(--panel);
   padding: 12px;
+  animation: cardIn .24s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
 }
 
 .asset-thumb {
@@ -382,6 +457,12 @@ select:focus {
   width: 100%;
   height: 180px;
   object-fit: cover;
+  transition: transform .35s var(--ease);
+}
+
+.asset-card:hover .asset-thumb img,
+.visual-preview-card:hover img {
+  transform: scale(1.035);
 }
 
 .asset-meta {
@@ -418,6 +499,15 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: white;
+  animation: cardIn .24s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease);
+}
+
+.edit-block:focus-within {
+  border-color: rgba(173, 16, 24, .42);
+  box-shadow: 0 12px 26px rgba(173, 16, 24, .10);
 }
 
 .block-label {
@@ -459,6 +549,9 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: white;
+  transition:
+    box-shadow .22s var(--ease),
+    opacity .22s var(--ease);
 }
 
 .translation-row {
@@ -469,6 +562,15 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: white;
+  animation: cardIn .24s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease);
+}
+
+.translation-row:focus-within {
+  border-color: rgba(14, 109, 104, .46);
+  box-shadow: 0 12px 26px rgba(14, 109, 104, .10);
 }
 
 .visual-editor-grid {
@@ -507,6 +609,11 @@ select:focus {
   background: rgba(255, 249, 239, .94);
   box-shadow: var(--shadow);
   overflow: hidden;
+  animation: cardIn .26s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
 }
 
 .shop-section-card summary {
@@ -517,6 +624,17 @@ select:focus {
   padding: 16px;
   list-style: none;
   cursor: pointer;
+  transition:
+    background-color .2s var(--ease),
+    color .2s var(--ease);
+}
+
+.shop-section-card[open] {
+  border-color: rgba(173, 16, 24, .30);
+}
+
+.shop-section-card[open] summary {
+  background: rgba(173, 16, 24, .07);
 }
 
 .shop-section-card summary > div {
@@ -585,6 +703,11 @@ select:focus {
   background: rgba(255, 249, 239, .94);
   box-shadow: var(--shadow);
   padding: 14px;
+  animation: cardIn .26s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
 }
 
 .site-section-summary {
@@ -664,6 +787,9 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 6px;
   background: white;
+  transition:
+    box-shadow .22s var(--ease),
+    opacity .22s var(--ease);
 }
 
 .confirmation-card textarea {
@@ -690,6 +816,11 @@ select:focus {
   border-radius: 8px;
   background: white;
   overflow: hidden;
+  animation: cardIn .24s var(--ease) both;
+  transition:
+    border-color .2s var(--ease),
+    box-shadow .2s var(--ease),
+    transform .2s var(--ease);
 }
 
 .visual-preview-card img {
@@ -739,12 +870,166 @@ select:focus {
   color: white;
   padding: 13px 15px;
   box-shadow: var(--shadow);
-  transition: .2s ease;
+  transition:
+    opacity .2s var(--ease),
+    transform .2s var(--ease);
 }
 
 .toast.is-visible {
   transform: translateY(0);
   opacity: 1;
+}
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(239, 231, 216, .70);
+  backdrop-filter: blur(8px);
+}
+
+.loader-card {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: min(430px, 100%);
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: rgba(255, 249, 239, .96);
+  box-shadow: 0 28px 70px rgba(25, 21, 18, .22);
+  padding: 16px;
+  animation: loaderCardIn .24s var(--ease) both;
+}
+
+.loader-card strong {
+  display: block;
+  font-size: 16px;
+}
+
+.loader-card p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loader-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(25, 21, 18, .22);
+  border-radius: 50%;
+  background: white;
+}
+
+.loader-mark::before {
+  position: absolute;
+  inset: 6px;
+  content: "";
+  border: 3px solid rgba(173, 16, 24, .18);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: loaderSpin .82s linear infinite;
+}
+
+.loader-mark span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: loaderPulse 1s var(--ease) infinite;
+}
+
+.site-section-list > *,
+.asset-grid > *,
+.block-list > *,
+.translation-list > *,
+.visual-preview > * {
+  animation: cardIn .26s var(--ease) both;
+}
+
+.site-section-list > *:nth-child(2),
+.asset-grid > *:nth-child(2),
+.block-list > *:nth-child(2),
+.translation-list > *:nth-child(2),
+.visual-preview > *:nth-child(2) {
+  animation-delay: .03s;
+}
+
+.site-section-list > *:nth-child(3),
+.asset-grid > *:nth-child(3),
+.block-list > *:nth-child(3),
+.translation-list > *:nth-child(3),
+.visual-preview > *:nth-child(3) {
+  animation-delay: .06s;
+}
+
+.site-section-list > *:nth-child(n + 4),
+.asset-grid > *:nth-child(n + 4),
+.block-list > *:nth-child(n + 4),
+.translation-list > *:nth-child(n + 4),
+.visual-preview > *:nth-child(n + 4) {
+  animation-delay: .09s;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loaderCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes loaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loaderPulse {
+  0%,
+  100% {
+    opacity: .55;
+    transform: scale(.86);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 980px) {
@@ -936,5 +1221,27 @@ select:focus {
     bottom: 12px;
     left: 12px;
     max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  button:not(:disabled):hover,
+  button:not(:disabled):active,
+  input:focus,
+  textarea:focus,
+  select:focus,
+  .home-steps div:hover,
+  .asset-card:hover .asset-thumb img,
+  .visual-preview-card:hover img {
+    transform: none;
   }
 }
