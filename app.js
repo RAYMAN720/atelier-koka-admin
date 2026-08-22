@@ -15,6 +15,165 @@ const PAGE_OPTIONS = [
 
 const IMAGE_EXTENSIONS = /\.(avif|gif|jpe?g|png|svg|webp)$/i;
 
+const CONFIRMATION_CONTACTS = {
+  rayann: {
+    name: 'Rayann',
+    phone: '+393890588610',
+    whatsapp: '393890588610'
+  },
+  steve: {
+    name: 'Steve',
+    phone: '+41766815702',
+    whatsapp: '41766815702'
+  }
+};
+
+const HOME_EDITOR_SECTIONS = [
+  {
+    title: 'Page details',
+    description: 'What appears in the browser tab and search previews.',
+    fields: [
+      { label: 'Browser tab title', selector: 'title', kind: 'short' },
+      { label: 'Search description', selector: 'meta[name="description"]', attribute: 'content', kind: 'long' }
+    ]
+  },
+  {
+    title: 'Top announcement bar',
+    description: 'The red strip at the very top of the website.',
+    fields: [
+      { label: 'Left text', selector: '.topbar span:nth-of-type(1)', kind: 'short' },
+      { label: 'Right text', selector: '.topbar span:nth-of-type(2)', kind: 'short' }
+    ]
+  },
+  {
+    title: 'Header menu',
+    description: 'The navigation people use to move around the site.',
+    fields: [
+      { label: 'Artist menu label', selector: '.nav-links > a:nth-child(1)', kind: 'short' },
+      { label: 'Work menu label', selector: '.nav-links > a:nth-child(2)', kind: 'short' },
+      { label: 'Dates menu label', selector: '.nav-links > a:nth-child(3)', kind: 'short' },
+      { label: 'Archive menu label', selector: '.nav-links > a:nth-child(4)', kind: 'short' },
+      { label: 'Contact menu label', selector: '.nav-links > a:nth-child(5)', kind: 'short' },
+      { label: 'Instagram button label', selector: '.nav-links > a:nth-child(6)', kind: 'short' },
+      { label: 'Instagram button link', selector: '.nav-links > a:nth-child(6)', attribute: 'href', kind: 'url' }
+    ]
+  },
+  {
+    title: 'Hero first screen',
+    description: 'The first thing visitors see when they open the site.',
+    fields: [
+      { label: 'Small red label', selector: '.hero .kicker', kind: 'short' },
+      { label: 'Main big title', selector: '.hero h1', kind: 'short' },
+      { label: 'Stamp label', selector: '.hero-stamp', kind: 'short' },
+      { label: 'Intro paragraph', selector: '.hero-copy', kind: 'long' },
+      { label: 'Main button text', selector: '.hero .btn-row a:nth-child(1)', kind: 'short' },
+      { label: 'Main button link', selector: '.hero .btn-row a:nth-child(1)', attribute: 'href', kind: 'url' },
+      { label: 'Second button text', selector: '.hero .btn-row a:nth-child(2)', kind: 'short' },
+      { label: 'Second button link', selector: '.hero .btn-row a:nth-child(2)', attribute: 'href', kind: 'url' }
+    ]
+  },
+  {
+    title: 'Atelier story',
+    description: 'The section explaining the feeling of the studio.',
+    fields: [
+      { label: 'Section label', selector: 'main > section:nth-of-type(2) .section-head .kicker', kind: 'short' },
+      { label: 'Big section title', selector: 'main > section:nth-of-type(2) .section-head h2', kind: 'long' },
+      { label: 'Section paragraph', selector: 'main > section:nth-of-type(2) .section-head p', kind: 'long' },
+      { label: 'First card label', selector: 'main > section:nth-of-type(2) .poster:nth-child(1) .smallcaps', kind: 'short' },
+      { label: 'First card title', selector: 'main > section:nth-of-type(2) .poster:nth-child(1) h3', kind: 'short' },
+      { label: 'First card text', selector: 'main > section:nth-of-type(2) .poster:nth-child(1) p', kind: 'long' },
+      { label: 'Second card label', selector: 'main > section:nth-of-type(2) .poster:nth-child(2) .smallcaps', kind: 'short' },
+      { label: 'Second card title', selector: 'main > section:nth-of-type(2) .poster:nth-child(2) h3', kind: 'short' },
+      { label: 'Second card text', selector: 'main > section:nth-of-type(2) .poster:nth-child(2) p', kind: 'long' }
+    ]
+  },
+  {
+    title: 'Work cards',
+    description: 'The selected work area with tattoo, drawing, and flash cards.',
+    fields: [
+      { label: 'Section label', selector: '#work .section-head .kicker', kind: 'short' },
+      { label: 'Big section title', selector: '#work .section-head h2', kind: 'short' },
+      { label: 'Section paragraph', selector: '#work .section-head p', kind: 'long' },
+      { label: 'Card 1 category', selector: '#work .card:nth-child(1) .meta span:nth-child(1)', kind: 'short' },
+      { label: 'Card 1 archive label', selector: '#work .card:nth-child(1) .meta span:nth-child(2)', kind: 'short' },
+      { label: 'Card 1 title', selector: '#work .card:nth-child(1) h3', kind: 'short' },
+      { label: 'Card 1 text', selector: '#work .card:nth-child(1) p', kind: 'long' },
+      { label: 'Card 2 category', selector: '#work .card:nth-child(2) .meta span:nth-child(1)', kind: 'short' },
+      { label: 'Card 2 archive label', selector: '#work .card:nth-child(2) .meta span:nth-child(2)', kind: 'short' },
+      { label: 'Card 2 title', selector: '#work .card:nth-child(2) h3', kind: 'short' },
+      { label: 'Card 2 text', selector: '#work .card:nth-child(2) p', kind: 'long' },
+      { label: 'Card 3 category', selector: '#work .card:nth-child(3) .meta span:nth-child(1)', kind: 'short' },
+      { label: 'Card 3 archive label', selector: '#work .card:nth-child(3) .meta span:nth-child(2)', kind: 'short' },
+      { label: 'Card 3 title', selector: '#work .card:nth-child(3) h3', kind: 'short' },
+      { label: 'Card 3 text', selector: '#work .card:nth-child(3) p', kind: 'long' },
+      { label: 'Work button text', selector: '#work .btn-row a', kind: 'short' },
+      { label: 'Work button link', selector: '#work .btn-row a', attribute: 'href', kind: 'url' }
+    ]
+  },
+  {
+    title: 'Artist spotlight',
+    description: 'The section that introduces AKASTEVE.',
+    fields: [
+      { label: 'Section label', selector: 'main > section:nth-of-type(4) .kicker', kind: 'short' },
+      { label: 'Big title', selector: 'main > section:nth-of-type(4) h2', kind: 'long' },
+      { label: 'Paragraph', selector: 'main > section:nth-of-type(4) .lede', kind: 'long' },
+      { label: 'Button text', selector: 'main > section:nth-of-type(4) .btn', kind: 'short' },
+      { label: 'Button link', selector: 'main > section:nth-of-type(4) .btn', attribute: 'href', kind: 'url' }
+    ]
+  },
+  {
+    title: 'Instagram band',
+    description: 'The red callout for current work and updates.',
+    fields: [
+      { label: 'Small label', selector: 'main > section:nth-of-type(5) .smallcaps', kind: 'short' },
+      { label: 'Instagram handle', selector: 'main > section:nth-of-type(5) .social-big', kind: 'short' },
+      { label: 'Instagram link', selector: 'main > section:nth-of-type(5) .social-big', attribute: 'href', kind: 'url' },
+      { label: 'Paragraph', selector: 'main > section:nth-of-type(5) .lede', kind: 'long' }
+    ]
+  },
+  {
+    title: 'Booking section',
+    description: 'The contact area and the appointment call to action.',
+    fields: [
+      { label: 'Section label', selector: '#booking .kicker', kind: 'short' },
+      { label: 'Big title', selector: '#booking h2', kind: 'short' },
+      { label: 'Paragraph', selector: '#booking .lede', kind: 'long' },
+      { label: 'Instagram button text', selector: '#booking .btn-row a', kind: 'short' },
+      { label: 'Instagram button link', selector: '#booking .btn-row a', attribute: 'href', kind: 'url' },
+      { label: 'Form note', selector: '#booking [data-form-status]', kind: 'long' }
+    ]
+  },
+  {
+    title: 'Images',
+    description: 'Choose image files that already exist in the website assets folder.',
+    fields: [
+      { label: 'Header logo', selector: 'header .brand-logo', attribute: 'src', kind: 'image' },
+      { label: 'Header logo description', selector: 'header .brand-logo', attribute: 'alt', kind: 'short' },
+      { label: 'Hero logo image', selector: '.hero-logo', attribute: 'src', kind: 'image' },
+      { label: 'Hero logo description', selector: '.hero-logo', attribute: 'alt', kind: 'short' },
+      { label: 'Work card logo image', selector: '#work .logo-media img', attribute: 'src', kind: 'image' },
+      { label: 'Work card logo description', selector: '#work .logo-media img', attribute: 'alt', kind: 'short' },
+      { label: 'Footer logo', selector: 'footer .brand-logo', attribute: 'src', kind: 'image' },
+      { label: 'Footer logo description', selector: 'footer .brand-logo', attribute: 'alt', kind: 'short' }
+    ]
+  },
+  {
+    title: 'Footer',
+    description: 'The information at the bottom of the site.',
+    fields: [
+      { label: 'First footer text', selector: '.footer-grid > div:nth-child(1) p', kind: 'long' },
+      { label: 'Studio title', selector: '.footer-grid > div:nth-child(2) strong', kind: 'short' },
+      { label: 'Studio text', selector: '.footer-grid > div:nth-child(2) p', kind: 'long' },
+      { label: 'Online title', selector: '.footer-grid > div:nth-child(3) strong', kind: 'short' },
+      { label: 'Instagram footer text', selector: '.footer-grid > div:nth-child(3) p a:nth-of-type(1)', kind: 'short' },
+      { label: 'Instagram footer link', selector: '.footer-grid > div:nth-child(3) p a:nth-of-type(1)', attribute: 'href', kind: 'url' },
+      { label: 'Contact footer text', selector: '.footer-grid > div:nth-child(3) p a:nth-of-type(2)', kind: 'short' },
+      { label: 'Contact footer link', selector: '.footer-grid > div:nth-child(3) p a:nth-of-type(2)', attribute: 'href', kind: 'url' },
+      { label: 'Copyright line', selector: '.footer small', kind: 'short' }
+    ]
+  }
+];
+
 const state = {
   config: loadConfig(),
   token: loadToken(),
@@ -39,6 +198,13 @@ const state = {
     object: null,
     literalStart: 0,
     literalEnd: 0
+  },
+  homeEditor: {
+    path: 'index.html',
+    sha: '',
+    document: null,
+    lastSavedAt: '',
+    lastCommitMessage: ''
   }
 };
 
@@ -93,6 +259,16 @@ function cacheElements() {
     'siteSectionList',
     'visualPreview',
     'publicSiteLink',
+    'homeEditorStatus',
+    'homePreviewFrame',
+    'confirmRecipientSelect',
+    'confirmAfterSaveInput',
+    'confirmationCard',
+    'confirmationState',
+    'confirmationMessageInput',
+    'sendWhatsappConfirmBtn',
+    'sendSmsConfirmBtn',
+    'copyConfirmMessageBtn',
     'loadTranslationsBtn',
     'saveTranslationsBtn',
     'translationSearchInput',
@@ -180,19 +356,13 @@ function bindForms() {
 }
 
 function bindSiteContentTools() {
-  els.loadSiteContentBtn.addEventListener('click', () => runTask('Loading homepage...', loadSiteContent));
-  els.saveSiteContentBtn.addEventListener('click', () => runTask('Saving homepage...', saveSiteContent));
-  els.addSectionBtn.addEventListener('click', () => {
-    if (!state.siteContent.object) {
-      showToast('Load the homepage first');
-      return;
-    }
-    const sections = getHomepageSections();
-    sections.push(sectionTemplate(els.sectionTypeSelect.value));
-    renderSiteSections();
-    renderVisualPreview();
-    showToast('Section added');
-  });
+  els.loadSiteContentBtn?.addEventListener('click', () => runTask('Loading homepage...', loadHomeEditor));
+  els.saveSiteContentBtn?.addEventListener('click', () => runTask('Saving homepage...', saveHomeEditor));
+  els.siteContentCommitInput?.addEventListener('input', () => updateConfirmationMessage());
+  els.confirmRecipientSelect?.addEventListener('change', () => updateConfirmationMessage());
+  els.copyConfirmMessageBtn?.addEventListener('click', copyConfirmationMessage);
+  els.sendWhatsappConfirmBtn?.addEventListener('click', () => openConfirmationMessage('whatsapp'));
+  els.sendSmsConfirmBtn?.addEventListener('click', () => openConfirmationMessage('sms'));
 }
 
 function bindPageTools() {
@@ -244,6 +414,10 @@ function hydrateControls() {
   customOption.value = '__custom__';
   customOption.textContent = 'Custom path';
   els.pageSelect.appendChild(customOption);
+
+  renderHomeEditorSections();
+  renderHomePreview();
+  updateConfirmationMessage();
 }
 
 function loadConfig() {
@@ -557,6 +731,243 @@ function renderImageBlocks() {
 
 function refreshImageSelects() {
   if (state.currentPage.document) renderImageBlocks();
+  if (state.homeEditor.document) renderHomeEditorSections();
+}
+
+async function loadHomeEditor() {
+  if (!state.assets.length) await loadAssets();
+
+  const file = await getContent(state.homeEditor.path);
+  const html = decodeBase64(file.content);
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+
+  state.homeEditor = {
+    ...state.homeEditor,
+    sha: file.sha,
+    document: doc,
+    lastSavedAt: '',
+    lastCommitMessage: ''
+  };
+
+  els.homeEditorStatus.textContent = 'Homepage loaded. Open a block below and edit the fields.';
+  renderHomeEditorSections();
+  renderHomePreview();
+  updateConfirmationMessage();
+  showToast('Homepage loaded');
+}
+
+function renderHomeEditorSections() {
+  els.siteSectionList.innerHTML = '';
+  els.siteSectionCount.textContent = String(HOME_EDITOR_SECTIONS.length);
+
+  if (!state.homeEditor.document) {
+    els.siteSectionList.innerHTML = `
+      <div class="empty-editor">
+        <strong>Start here</strong>
+        <p>Click Load homepage. The editor will open simple blocks for the text, links, buttons, and images on the public homepage.</p>
+      </div>
+    `;
+    return;
+  }
+
+  HOME_EDITOR_SECTIONS.forEach((section, sectionIndex) => {
+    const details = document.createElement('details');
+    details.className = 'shop-section-card';
+    if (sectionIndex === 0) details.open = true;
+
+    const missingCount = section.fields.filter(field => !getHomeFieldElement(field)).length;
+    const completeCount = section.fields.length - missingCount;
+    details.innerHTML = `
+      <summary>
+        <span class="shop-section-number">${sectionIndex + 1}</span>
+        <span>
+          <strong>${escapeHtml(section.title)}</strong>
+          <small>${escapeHtml(section.description)}</small>
+        </span>
+        <em>${completeCount}/${section.fields.length}</em>
+      </summary>
+      <div class="shop-field-grid"></div>
+    `;
+
+    const grid = details.querySelector('.shop-field-grid');
+    section.fields.forEach((field, fieldIndex) => {
+      grid.appendChild(renderHomeField(field, `${sectionIndex}-${fieldIndex}`));
+    });
+
+    els.siteSectionList.appendChild(details);
+  });
+}
+
+function renderHomeField(field, key) {
+  const element = getHomeFieldElement(field);
+  const row = document.createElement('label');
+  row.className = 'shop-field';
+  if (!element) row.classList.add('is-missing');
+
+  const currentValue = element ? readHomeFieldValue(field, element) : '';
+  const controlId = `home-field-${key}`;
+  const help = field.attribute === 'href'
+    ? 'Use a page path like contact/index.html or a full link like https://...'
+    : field.kind === 'image'
+      ? 'Choose an uploaded image from the website assets folder.'
+      : 'This is visible website text.';
+
+  row.innerHTML = `
+    <span>${escapeHtml(field.label)}</span>
+    ${element ? renderHomeFieldControl(field, controlId, currentValue) : '<div class="missing-field">This block is not on the current page.</div>'}
+    <small>${escapeHtml(help)}</small>
+  `;
+
+  const control = row.querySelector('[data-home-field]');
+  if (control) {
+    control.addEventListener('input', () => updateHomeField(field, control.value));
+    control.addEventListener('change', () => updateHomeField(field, control.value));
+  }
+
+  return row;
+}
+
+function renderHomeFieldControl(field, controlId, value) {
+  const escapedValue = escapeAttribute(value);
+  if (field.kind === 'long') {
+    return `<textarea id="${controlId}" data-home-field rows="4">${escapeHtml(value)}</textarea>`;
+  }
+
+  if (field.kind === 'image') {
+    const resolvedPath = resolveSitePath(value, state.homeEditor.path);
+    const options = ['<option value="">No image selected</option>'];
+    if (value && !state.assets.some(asset => asset.path === resolvedPath)) {
+      options.push(`<option value="${escapedValue}" selected>Keep current image (${escapeHtml(value)})</option>`);
+    }
+    state.assets.forEach(asset => {
+      const selected = asset.path === resolvedPath ? ' selected' : '';
+      options.push(`<option value="${escapeAttribute(asset.path)}"${selected}>${escapeHtml(asset.path)}</option>`);
+    });
+    return `<select id="${controlId}" data-home-field>${options.join('')}</select>`;
+  }
+
+  const inputType = 'text';
+  return `<input id="${controlId}" data-home-field type="${inputType}" value="${escapedValue}">`;
+}
+
+function getHomeFieldElement(field) {
+  return state.homeEditor.document?.querySelector(field.selector) || null;
+}
+
+function readHomeFieldValue(field, element) {
+  if (field.attribute) return element.getAttribute(field.attribute) || '';
+  return getEditableText(element).trim();
+}
+
+function updateHomeField(field, value) {
+  const element = getHomeFieldElement(field);
+  if (!element) return;
+
+  if (field.attribute) {
+    const nextValue = field.kind === 'image' && value && !/^https?:|^data:/i.test(value)
+      ? relativePath(state.homeEditor.path, value)
+      : value;
+    element.setAttribute(field.attribute, nextValue);
+  } else {
+    setEditableText(element, value);
+  }
+
+  els.homeEditorStatus.textContent = 'Unsaved changes. Press Save changes when ready.';
+  renderHomePreview();
+  updateConfirmationMessage();
+}
+
+function renderHomePreview() {
+  if (!els.homePreviewFrame) return;
+  if (!state.homeEditor.document) {
+    els.homePreviewFrame.srcdoc = '<!doctype html><html><body><p>Load the homepage to see a preview.</p></body></html>';
+    return;
+  }
+
+  const clone = new DOMParser().parseFromString(serializeDocument(state.homeEditor.document), 'text/html');
+  const base = clone.createElement('base');
+  base.setAttribute('href', rawRootUrl());
+  clone.head.prepend(base);
+  clone.querySelectorAll('script').forEach(script => script.remove());
+  els.homePreviewFrame.srcdoc = serializeDocument(clone);
+}
+
+function saveHomeEditor() {
+  if (!state.homeEditor.document) {
+    showToast('Load the homepage before saving');
+    return Promise.resolve();
+  }
+
+  const commitMessage = els.siteContentCommitInput.value.trim() || 'Update homepage content';
+  const html = serializeDocument(state.homeEditor.document);
+  return putContent(
+    state.homeEditor.path,
+    encodeBase64(html),
+    commitMessage,
+    state.homeEditor.sha
+  ).then(result => {
+    state.homeEditor.sha = result.content.sha;
+    state.homeEditor.lastSavedAt = new Date().toISOString();
+    state.homeEditor.lastCommitMessage = commitMessage;
+    els.homeEditorStatus.textContent = 'Saved. Render will publish the update from GitHub.';
+    renderHomePreview();
+    updateConfirmationMessage();
+    showToast('Homepage saved');
+    if (els.confirmAfterSaveInput.checked) {
+      els.confirmationCard?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+}
+
+function updateConfirmationMessage() {
+  if (!els.confirmationMessageInput) return;
+  const contact = getSelectedConfirmationContact();
+  const savedText = state.homeEditor.lastSavedAt
+    ? `Saved at ${formatConfirmationTime(state.homeEditor.lastSavedAt)}`
+    : 'Ready to send after you save';
+  const commitText = state.homeEditor.lastCommitMessage || els.siteContentCommitInput?.value.trim() || 'Homepage update';
+  const message = [
+    `Hi ${contact.name}, Atelier Koka homepage changes are ready.`,
+    savedText,
+    `Change note: ${commitText}`,
+    'Public site: https://atelier-koka-site.onrender.com/',
+    'Please check it when Render has finished publishing.'
+  ].join('\n');
+
+  els.confirmationMessageInput.value = message;
+  els.confirmationState.textContent = state.homeEditor.lastSavedAt ? `For ${contact.name}` : 'Ready after save';
+}
+
+function getSelectedConfirmationContact() {
+  return CONFIRMATION_CONTACTS[els.confirmRecipientSelect?.value] || CONFIRMATION_CONTACTS.rayann;
+}
+
+function copyConfirmationMessage() {
+  const message = els.confirmationMessageInput?.value || '';
+  if (!message) return;
+  navigator.clipboard.writeText(message)
+    .then(() => showToast('Confirmation message copied'))
+    .catch(() => showToast('Could not copy message'));
+}
+
+function openConfirmationMessage(channel) {
+  const contact = getSelectedConfirmationContact();
+  const message = encodeURIComponent(els.confirmationMessageInput?.value || '');
+  const url = channel === 'whatsapp'
+    ? `https://wa.me/${contact.whatsapp}?text=${message}`
+    : `sms:${contact.phone}?&body=${message}`;
+  window.open(url, '_blank', 'noopener');
+}
+
+function formatConfirmationTime(isoDate) {
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(new Date(isoDate));
+  } catch {
+    return isoDate;
+  }
 }
 
 async function loadSiteContent() {

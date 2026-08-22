@@ -20,7 +20,7 @@
   <main class="app-shell">
     <aside class="sidebar" aria-label="Admin sections">
       <button class="nav-item is-active" data-panel-target="connectPanel" type="button">Connect</button>
-      <button class="nav-item" data-panel-target="sitePanel" type="button">Visual Site</button>
+      <button class="nav-item" data-panel-target="sitePanel" type="button">Home Editor</button>
       <button class="nav-item" data-panel-target="imagesPanel" type="button">Images</button>
       <button class="nav-item" data-panel-target="pagesPanel" type="button">Pages</button>
       <button class="nav-item" data-panel-target="translationsPanel" type="button">FR Text</button>
@@ -78,56 +78,77 @@
       <section class="panel" id="sitePanel">
         <div class="section-head">
           <div>
-            <p class="eyebrow">Visual homepage CMS</p>
-            <h2>See, duplicate and rewrite sections</h2>
+            <p class="eyebrow">Simple homepage editor</p>
+            <h2>Edit the site like a shop page</h2>
           </div>
           <div class="action-row">
             <button class="ghost-btn" id="loadSiteContentBtn" type="button">Load homepage</button>
-            <button class="primary-btn" id="saveSiteContentBtn" type="button">Save homepage</button>
+            <button class="primary-btn" id="saveSiteContentBtn" type="button">Save changes</button>
           </div>
         </div>
 
-        <div class="grid two">
+        <div class="home-steps" aria-label="Editing steps">
+          <div><span>1</span><strong>Load</strong><p>Open the current live homepage from GitHub.</p></div>
+          <div><span>2</span><strong>Edit</strong><p>Change words, links, buttons, and images section by section.</p></div>
+          <div><span>3</span><strong>Save</strong><p>Create the website update with one clear button.</p></div>
+          <div><span>4</span><strong>Confirm</strong><p>Message Rayann or Steve with the ready-made update text.</p></div>
+        </div>
+
+        <div class="grid two home-editor-top">
           <div class="tool-card form-stack">
+            <div class="status-note" id="homeEditorStatus">Homepage not loaded yet.</div>
             <label>
-              Add section type
-              <select id="sectionTypeSelect">
-                <option value="hero">Hero</option>
-                <option value="manifesto">Manifesto cards</option>
-                <option value="gallery">Image gallery</option>
-                <option value="editorial">Editorial split</option>
-                <option value="process">Process band</option>
-                <option value="booking">Booking block</option>
+              Save note
+              <input id="siteContentCommitInput" autocomplete="off" value="Update homepage sections">
+            </label>
+            <label>
+              Send confirmation to
+              <select id="confirmRecipientSelect">
+                <option value="rayann">Rayann (+39 389 058 8610)</option>
+                <option value="steve">Steve (+41 76 681 57 02)</option>
               </select>
             </label>
-            <button class="secondary-btn" id="addSectionBtn" type="button">Add section</button>
-            <label>
-              Commit message
-              <input id="siteContentCommitInput" autocomplete="off" value="Update homepage sections">
+            <label class="check-row">
+              <input id="confirmAfterSaveInput" type="checkbox" checked>
+              Show message buttons after saving
             </label>
           </div>
           <div class="tool-card">
-            <h3>What this edits</h3>
-            <p>The homepage is now powered by <strong>site-content.js</strong>. This visual editor loads exactly what is live in that file, then lets you rewrite the whole homepage structure.</p>
-            <p>Use duplicate when you want another section of the same type. Use the JSON editor inside each card for complete control.</p>
+            <h3>Plain editing rules</h3>
+            <p>Open a section, change the text you see on the website, then check the preview. Nothing is published until you press Save changes.</p>
+            <p>For images, upload first in Images, then come back here and choose the file from the image menu.</p>
           </div>
         </div>
 
-        <div class="visual-editor-grid">
+        <div class="visual-editor-grid shop-editor-grid">
           <div>
             <div class="mini-head">
-              <h3>Homepage sections</h3>
+              <h3>Homepage blocks</h3>
               <span id="siteSectionCount">0</span>
             </div>
             <div class="site-section-list" id="siteSectionList"></div>
           </div>
-          <div class="tool-card sticky-preview">
-            <div class="mini-head">
-              <h3>Section preview</h3>
-              <a id="publicSiteLink" href="https://atelier-koka-site.onrender.com/" target="_blank" rel="noopener">Open public site</a>
+          <aside class="editor-side-stack">
+            <div class="tool-card sticky-preview">
+              <div class="mini-head">
+                <h3>Live-style preview</h3>
+                <a id="publicSiteLink" href="https://atelier-koka-site.onrender.com/" target="_blank" rel="noopener">Open public site</a>
+              </div>
+              <iframe id="homePreviewFrame" title="Homepage preview" sandbox=""></iframe>
             </div>
-            <div class="visual-preview" id="visualPreview"></div>
-          </div>
+            <div class="tool-card confirmation-card" id="confirmationCard">
+              <div class="mini-head">
+                <h3>Confirmation message</h3>
+                <span id="confirmationState">Ready after save</span>
+              </div>
+              <textarea id="confirmationMessageInput" rows="6" readonly></textarea>
+              <div class="confirmation-actions">
+                <button class="secondary-btn" id="sendWhatsappConfirmBtn" type="button">WhatsApp</button>
+                <button class="ghost-btn" id="sendSmsConfirmBtn" type="button">SMS</button>
+                <button class="ghost-btn" id="copyConfirmMessageBtn" type="button">Copy</button>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -280,9 +301,10 @@
         <div class="tool-card help-copy">
           <ol>
             <li>Connect with a GitHub token for the public website repo.</li>
-            <li>Use Visual Site for homepage sections: edit, duplicate, reorder, add, or delete blocks.</li>
+            <li>Use Home Editor for simple homepage changes, section by section.</li>
             <li>Upload new tattoo, flash, drawing, or studio images in Images.</li>
-            <li>Open Pages for smaller direct edits to HTML pages outside the homepage system.</li>
+            <li>Open Pages only for advanced edits outside the guided homepage editor.</li>
+            <li>After saving, use the confirmation buttons to message Rayann or Steve.</li>
             <li>When English source text changes, update matching entries in FR Text.</li>
             <li>Save changes. Each save creates a GitHub commit for Render to deploy.</li>
           </ol>
